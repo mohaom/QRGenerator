@@ -10,6 +10,7 @@ using Newtonsoft.Json;
 using QRCoder;
 using System.Drawing;
 using System.Drawing.Imaging;
+using static QRCoder.PayloadGenerator;
 
 namespace QRGenerator
 {
@@ -21,13 +22,23 @@ namespace QRGenerator
             ILogger log)
         {
             log.LogInformation("Receieved Request to generate QR");
-            string data = req.Query["data"];
 
-            if (!string.IsNullOrEmpty(data))
+
+            if (!string.IsNullOrEmpty(req.Query["firstname"]))
             {
+
+
+                ContactData gen = new ContactData(ContactData.ContactOutputType.VCard3, req.Query["firstname"], req.Query["lastname"], req.Query["nickname"]
+                    , req.Query["phone"], req.Query["mobilephone"], req.Query["email"], req.Query["country"]);
+                string payload = gen.ToString();
+
+
+
                 QRCodeGenerator qrGenerator = new QRCodeGenerator();
-                QRCodeData qrCodeData = qrGenerator.CreateQrCode(data, QRCodeGenerator.ECCLevel.Q);
+                QRCodeData qrCodeData = qrGenerator.CreateQrCode(payload, QRCodeGenerator.ECCLevel.Q);
                 QRCode qrCode = new QRCode(qrCodeData);
+
+
 
                 Bitmap qrCodeImage = qrCode.GetGraphic(20);
               
